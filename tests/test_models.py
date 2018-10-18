@@ -39,7 +39,7 @@ class MessageTest(unittest.TestCase):
                 timestamp=datetime.datetime(2018, 10, 18, 18, 27, 5),
                 contents='hi how are you?'))
 
-    def test_messages_are_unequal_if_they_have_different_timestamps(self):
+    def test_messages_are_unequal_if_they_have_different_contents(self):
         self.assertNotEqual(
             models.Message(
                 sender='dummy_sender',
