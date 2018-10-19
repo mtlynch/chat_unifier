@@ -18,11 +18,11 @@ class InvalidMessageType(Error):
 
 SessionStartLine = collections.namedtuple(
     'SessionStartLine',
-    field_names=['timestamp', 'medium', 'sender', 'recipient'])
+    field_names=['timestamp', 'medium', 'local_username', 'remote_username'])
 
 SessionStopLine = collections.namedtuple(
     'SessionStopLine',
-    field_names=['timestamp', 'medium', 'sender', 'recipient'])
+    field_names=['timestamp', 'medium', 'local_username', 'remote_username'])
 
 InformationalMessageLine = collections.namedtuple(
     'InformationalMessageLine', field_names=['timestamp', 'medium', 'contents'])
@@ -71,16 +71,16 @@ def _parse_session_start(attributes):
     return SessionStartLine(
         timestamp=_parse_timestamp_attribute(attributes[u'time']),
         medium=attributes[u'medium'],
-        sender=attributes[u'from'],
-        recipient=attributes[u'to'])
+        local_username=attributes[u'from'],
+        remote_username=attributes[u'to'])
 
 
 def _parse_session_stop(attributes):
     return SessionStopLine(
         timestamp=_parse_timestamp_attribute(attributes[u'time']),
         medium=attributes[u'medium'],
-        sender=attributes[u'from'],
-        recipient=attributes[u'to'])
+        local_username=attributes[u'from'],
+        remote_username=attributes[u'to'])
 
 
 def _parse_message_attributes(attributes):
