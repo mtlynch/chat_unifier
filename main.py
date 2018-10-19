@@ -24,19 +24,21 @@ def configure_logging():
 def main(args):
     configure_logging()
     logger.info('Started runnning')
-    for filename in os.listdir(args.log_dir):
-        if not filename.endswith('xml'):
-            continue
-        full_path = os.path.join(args.log_dir, filename)
-        with open(full_path) as log_handle:
-            parser = trillian_parser.Parser()
-            history = parser.parse(log_handle.read())
-            debug_print.print_history(history)
+    for log_dir in args.log_dirs:
+        for filename in os.listdir(log_dir):
+            if not filename.endswith('xml'):
+                continue
+            full_path = os.path.join(log_dir, filename)
+            with open(full_path) as log_handle:
+                parser = trillian_parser.Parser()
+                history = parser.parse(log_handle.read())
+                debug_print.print_history(history)
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         prog='Chat Unifier',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('log_dir', help='Directory containing log files')
+    parser.add_argument(
+        'log_dirs', nargs='+', help='Directory containing log files')
     main(parser.parse_args())
