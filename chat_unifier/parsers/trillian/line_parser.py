@@ -3,6 +3,19 @@ import datetime
 import urllib
 from xml.dom import minidom
 
+
+class Error(Exception):
+    pass
+
+
+class InvalidSessionType(Error):
+    pass
+
+
+class InvalidMessageType(Error):
+    pass
+
+
 SessionStartLine = collections.namedtuple(
     'SessionStartLine',
     field_names=['timestamp', 'medium', 'sender', 'recipient'])
@@ -38,10 +51,17 @@ def parse(line):
 
 
 def _parse_session_attributes(attributes):
-    if attributes[u'type'] == u'start':
+    try:
+        session_type = attributes[u'type']
+    except KeyError:
+        raise InvalidSessionType('Session element has no \'type\' attribute')
+
+    if session_type == u'start':
         return _parse_session_start(attributes)
-    else:
+    elif session_type == u'stop':
         return _parse_session_stop(attributes)
+    else:
+        raise InvalidSessionType('Unrecognized session type: %s' % session_type)
 
 
 def _parse_session_start(attributes):
@@ -61,10 +81,17 @@ def _parse_session_stop(attributes):
 
 
 def _parse_message_attributes(attributes):
-    if attributes[u'type'] == u'outgoing_privateMessage':
+    try:
+        message_type = attributes[u'type']
+    except KeyError:
+        raise InvalidMessageType('Message element has no \'type\' attribute')
+
+    if message_type == u'outgoing_privateMessage':
         return _parse_outgoing_message(attributes)
-    else:
+    elif message_type == u'incoming_privateMessage':
         return _parse_incoming_message(attributes)
+    else:
+        raise InvalidMessageType('Unrecognized message type: %s' % message_type)
 
 
 def _parse_outgoing_message(attributes):
