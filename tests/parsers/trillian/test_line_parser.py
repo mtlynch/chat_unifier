@@ -9,7 +9,7 @@ class LineParserTest(unittest.TestCase):
     def test_parses_valid_session_start_line(self):
         self.assertEqual(
             line_parser.SessionStartLine(
-                timestamp=datetime.datetime(2005, 11, 20, 14, 7, 57),
+                timestamp=datetime.datetime(2005, 11, 20, 20, 7, 57),
                 medium='AIM',
                 sender='LocalUser456',
                 recipient='RemoteBuddy123'),

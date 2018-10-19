@@ -13,7 +13,7 @@ def parse(line):
 
 
 def _parse_session_start(attributes):
-    timestamp = datetime.datetime.fromtimestamp(int(attributes[u'time']))
+    timestamp = datetime.datetime.utcfromtimestamp(int(attributes[u'time']))
 
     return SessionStartLine(
         timestamp=timestamp,
