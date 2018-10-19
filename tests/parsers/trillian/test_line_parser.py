@@ -28,7 +28,15 @@ class LineParserTest(unittest.TestCase):
                 '<session type="stop" time="1132522555" medium="AIM" to="RemoteBuddy234" from="LocalUser789"/>'
             ))
 
-    def test_parsers_valid_outgoing_private_message_line(self):
+    def test_invalid_session_type_raises_exception(self):
+        with self.assertRaises(line_parser.InvalidSessionType):
+            line_parser.parse('<session type="dummy_invalid_type"/>')
+
+    def test_session_with_no_type_attribute_raises_exception(self):
+        with self.assertRaises(line_parser.InvalidSessionType):
+            line_parser.parse('<session />')
+
+    def test_parses_valid_outgoing_private_message_line(self):
         self.assertEqual(
             line_parser.OutgoingPrivateMessageLine(
                 timestamp=datetime.datetime(2005, 8, 25, 1, 23, 31),
@@ -41,7 +49,7 @@ class LineParserTest(unittest.TestCase):
                 '<message type="outgoing_privateMessage" time="1124933011" medium="AIM" to="RemoteBuddy888" from="LocalUser111" from_display="Me" text="do%20you%20want%20me%20to%20bring%20up%20the%20books%20tomorrow%3F"/>'
             ))
 
-    def test_parsers_valid_incoming_private_message_line(self):
+    def test_parses_valid_incoming_private_message_line(self):
         self.assertEqual(
             line_parser.IncomingPrivateMessageLine(
                 timestamp=datetime.datetime(2005, 8, 25, 1, 23, 45),
@@ -53,3 +61,11 @@ class LineParserTest(unittest.TestCase):
             line_parser.parse(
                 '<message type="incoming_privateMessage" time="1124933025" medium="AIM" to="LocalUser222" from="RemoteBuddy555" from_display="Steve" text="hmm%2E%2E%2E%20no%20thanks"/>'
             ))
+
+    def test_invalid_message_type_raises_exception(self):
+        with self.assertRaises(line_parser.InvalidMessageType):
+            line_parser.parse('<message type="dummy_invalid_type" />')
+
+    def test_message_with_no_type_attribute_raises_exception(self):
+        with self.assertRaises(line_parser.InvalidMessageType):
+            line_parser.parse('<message />')
