@@ -40,3 +40,16 @@ class LineParserTest(unittest.TestCase):
             line_parser.parse(
                 '<message type="outgoing_privateMessage" time="1124933011" medium="AIM" to="RemoteBuddy888" from="LocalUser111" from_display="Me" text="do%20you%20want%20me%20to%20bring%20up%20the%20books%20tomorrow%3F"/>'
             ))
+
+    def test_parsers_valid_incoming_private_message_line(self):
+        self.assertEqual(
+            line_parser.IncomingPrivateMessageLine(
+                timestamp=datetime.datetime(2005, 8, 25, 1, 23, 45),
+                medium='AIM',
+                sender='RemoteBuddy555',
+                sender_display='Steve',
+                recipient='LocalUser222',
+                contents='hmm... no thanks'),
+            line_parser.parse(
+                '<message type="incoming_privateMessage" time="1124933025" medium="AIM" to="LocalUser222" from="RemoteBuddy555" from_display="Steve" text="hmm%2E%2E%2E%20no%20thanks"/>'
+            ))
