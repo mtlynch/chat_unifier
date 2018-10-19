@@ -5,4 +5,5 @@ Message = collections.namedtuple(
 
 Session = collections.namedtuple('Session', field_names=['messages'])
 
-History = collections.namedtuple('History', field_names=['sessions'])
+History = collections.namedtuple(
+    'History', field_names=['local_username', 'remote_usernames', 'sessions'])

@@ -73,19 +73,27 @@ class HistoryTest(unittest.TestCase):
 
     def test_identical_histories_are_equal(self):
         self.assertEqual(
-            models.History(sessions=[
-                models.Session(messages=[
-                    models.Message(
-                        sender='dummy_sender',
-                        timestamp=datetime.datetime(2018, 10, 18, 18, 27, 5),
-                        contents='hi how are you?')
-                ])
-            ]),
-            models.History(sessions=[
-                models.Session(messages=[
-                    models.Message(
-                        sender='dummy_sender',
-                        timestamp=datetime.datetime(2018, 10, 18, 18, 27, 5),
-                        contents='hi how are you?')
-                ])
-            ]))
+            models.History(
+                local_username='dummy_local123',
+                remote_usernames=['dummy_remote345'],
+                sessions=[
+                    models.Session(messages=[
+                        models.Message(
+                            sender='dummy_sender',
+                            timestamp=datetime.datetime(2018, 10, 18, 18, 27,
+                                                        5),
+                            contents='hi how are you?')
+                    ])
+                ]),
+            models.History(
+                local_username='dummy_local123',
+                remote_usernames=['dummy_remote345'],
+                sessions=[
+                    models.Session(messages=[
+                        models.Message(
+                            sender='dummy_sender',
+                            timestamp=datetime.datetime(2018, 10, 18, 18, 27,
+                                                        5),
+                            contents='hi how are you?')
+                    ])
+                ]))

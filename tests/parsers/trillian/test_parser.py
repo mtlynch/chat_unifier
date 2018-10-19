@@ -15,15 +15,20 @@ class ParserTest(unittest.TestCase):
 <message type="outgoing_privateMessage" time="1132522524" medium="AIM" to="RemoteBuddy123" from="LocalUser456" from_display="Me" text="nm"/>
 <session type="stop" time="1132522555" medium="AIM" to="RemoteBuddy123" from="LocalUser456"/>
 """.lstrip()),
-            models.History(sessions=[
-                models.Session(messages=[
-                    models.Message(
-                        sender=u'RemoteBuddy123',
-                        timestamp=datetime.datetime(2005, 11, 20, 20, 7, 57),
-                        contents=u'what\'s up'),
-                    models.Message(
-                        sender=u'LocalUser456',
-                        timestamp=datetime.datetime(2005, 11, 20, 21, 35, 24),
-                        contents=u'nm')
-                ])
-            ]))
+            models.History(
+                local_username='LocalUser456',
+                remote_usernames=['RemoteBuddy123'],
+                sessions=[
+                    models.Session(messages=[
+                        models.Message(
+                            sender=u'RemoteBuddy123',
+                            timestamp=datetime.datetime(2005, 11, 20, 20, 7,
+                                                        57),
+                            contents=u'what\'s up'),
+                        models.Message(
+                            sender=u'LocalUser456',
+                            timestamp=datetime.datetime(2005, 11, 20, 21, 35,
+                                                        24),
+                            contents=u'nm')
+                    ])
+                ]))
