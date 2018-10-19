@@ -18,6 +18,13 @@ OutgoingPrivateMessageLine = collections.namedtuple(
         'contents'
     ])
 
+IncomingPrivateMessageLine = collections.namedtuple(
+    'IncomingPrivateMessageLine',
+    field_names=[
+        'timestamp', 'medium', 'sender', 'sender_display', 'recipient',
+        'contents'
+    ])
+
 
 def parse(line):
     document = minidom.parseString(line)
@@ -71,7 +78,13 @@ def _parse_outgoing_message(attributes):
 
 
 def _parse_incoming_message(attributes):
-    raise NotImplementedError('Incoming messages not yet supported')
+    return IncomingPrivateMessageLine(
+        timestamp=_parse_timestamp_attribute(attributes[u'time']),
+        medium=attributes[u'medium'],
+        sender=attributes[u'from'],
+        sender_display=attributes[u'from_display'],
+        recipient=attributes[u'to'],
+        contents=_decode_message_text(attributes[u'text']))
 
 
 def _decode_message_text(text):
