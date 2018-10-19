@@ -1,7 +1,11 @@
 #!/usr/bin/python2
 
 import argparse
+import os
 import logging
+
+from chat_unifier import debug_print
+from chat_unifier.parsers.trillian import parser as trillian_parser
 
 logger = logging.getLogger(__name__)
 
@@ -20,10 +24,19 @@ def configure_logging():
 def main(args):
     configure_logging()
     logger.info('Started runnning')
+    for filename in os.listdir(args.log_dir):
+        if not filename.endswith('xml'):
+            continue
+        full_path = os.path.join(args.log_dir, filename)
+        with open(full_path) as log_handle:
+            parser = trillian_parser.Parser()
+            history = parser.parse(log_handle.read())
+            debug_print.print_history(history)
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
-        prog='Python Seed',
+        prog='Chat Unifier',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument('log_dir', help='Directory containing log files')
     main(parser.parse_args())
