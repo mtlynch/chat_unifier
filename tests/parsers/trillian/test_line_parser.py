@@ -62,6 +62,16 @@ class LineParserTest(unittest.TestCase):
                 '<message type="incoming_privateMessage" time="1124933025" medium="AIM" to="LocalUser222" from="RemoteBuddy555" from_display="Steve" text="hmm%2E%2E%2E%20no%20thanks"/>'
             ))
 
+    def test_parses_valid_informational_message_line(self):
+        self.assertEqual(
+            line_parser.InformationalMessageLine(
+                timestamp=datetime.datetime(2005, 9, 11, 3, 35, 37),
+                medium='AIM',
+                contents='"Steve" signed on at Sat Sep 10 23:35:37 2005.'),
+            line_parser.parse(
+                '<message type="information_standard" time="1126409737" medium="AIM" text="%22Steve%22%20signed%20on%20at%20Sat%20Sep%2010%2023%3A35%3A37%202005%2E"/>'
+            ))
+
     def test_invalid_message_type_raises_exception(self):
         with self.assertRaises(line_parser.InvalidMessageType):
             line_parser.parse('<message type="dummy_invalid_type" />')

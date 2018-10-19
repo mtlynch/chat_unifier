@@ -24,6 +24,9 @@ SessionStopLine = collections.namedtuple(
     'SessionStopLine',
     field_names=['timestamp', 'medium', 'sender', 'recipient'])
 
+InformationalMessageLine = collections.namedtuple(
+    'InformationalMessageLine', field_names=['timestamp', 'medium', 'contents'])
+
 OutgoingPrivateMessageLine = collections.namedtuple(
     'OutgoingPrivateMessageLine',
     field_names=[
@@ -86,12 +89,21 @@ def _parse_message_attributes(attributes):
     except KeyError:
         raise InvalidMessageType('Message element has no \'type\' attribute')
 
-    if message_type == u'outgoing_privateMessage':
+    if message_type == u'information_standard':
+        return _parse_informational_message(attributes)
+    elif message_type == u'outgoing_privateMessage':
         return _parse_outgoing_message(attributes)
     elif message_type == u'incoming_privateMessage':
         return _parse_incoming_message(attributes)
     else:
         raise InvalidMessageType('Unrecognized message type: %s' % message_type)
+
+
+def _parse_informational_message(attributes):
+    return InformationalMessageLine(
+        timestamp=_parse_timestamp_attribute(attributes[u'time']),
+        medium=attributes[u'medium'],
+        contents=_decode_message_text(attributes[u'text']))
 
 
 def _parse_outgoing_message(attributes):
