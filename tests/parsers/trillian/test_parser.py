@@ -1,10 +1,9 @@
 import unittest
 
-from chat_unifier.parsers import trillian
+from chat_unifier.parsers.trillian import parser
 
 
 class TrillianTest(unittest.TestCase):
-    """Replace this with a real unit test class."""
 
     def test_parse_log_with_one_simple_conversation(self):
         log_contents = r"""
@@ -14,4 +13,4 @@ class TrillianTest(unittest.TestCase):
 <session type="stop" time="1132522555" medium="AIM" to="RemoteBuddy123" from="LocalUser456"/>
 """.lstrip()
         with self.assertRaises(NotImplementedError):
-            trillian.parse(log_contents)
+            parser.Parser().parse(log_contents)
