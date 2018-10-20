@@ -5,6 +5,7 @@ import os
 import logging
 
 from chat_unifier import debug_print
+from chat_unifier import history_merger
 from chat_unifier.parsers.trillian import parser as trillian_parser
 
 logger = logging.getLogger(__name__)
@@ -24,6 +25,7 @@ def configure_logging():
 def main(args):
     configure_logging()
     logger.info('Started runnning')
+    merger = history_merger.Merger()
     for log_dir in args.log_dirs:
         for filename in os.listdir(log_dir):
             if not filename.endswith('xml'):
@@ -31,8 +33,10 @@ def main(args):
             full_path = os.path.join(log_dir, filename)
             with open(full_path) as log_handle:
                 parser = trillian_parser.Parser()
-                history = parser.parse(log_handle.read())
-                debug_print.print_history(history)
+                merger.add(parser.parse(log_handle.read()))
+                logger.info('Parsed %s', filename)
+    for history in merger:
+        debug_print.print_history(history)
 
 
 if __name__ == '__main__':
