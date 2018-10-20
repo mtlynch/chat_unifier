@@ -51,24 +51,6 @@ class MessageTest(unittest.TestCase):
                 contents='hi how are you?'))
 
 
-class SesssionTest(unittest.TestCase):
-
-    def test_identical_sessions_are_equal(self):
-        self.assertEqual(
-            models.Session(messages=[
-                models.Message(
-                    sender='dummy_sender',
-                    timestamp=datetime.datetime(2018, 10, 18, 18, 27, 5),
-                    contents='hi how are you?')
-            ]),
-            models.Session(messages=[
-                models.Message(
-                    sender='dummy_sender',
-                    timestamp=datetime.datetime(2018, 10, 18, 18, 27, 5),
-                    contents='hi how are you?')
-            ]))
-
-
 class HistoryTest(unittest.TestCase):
 
     def test_identical_histories_are_equal(self):
@@ -76,24 +58,18 @@ class HistoryTest(unittest.TestCase):
             models.History(
                 local_username='dummy_local123',
                 remote_usernames=['dummy_remote345'],
-                sessions=[
-                    models.Session(messages=[
-                        models.Message(
-                            sender='dummy_sender',
-                            timestamp=datetime.datetime(2018, 10, 18, 18, 27,
-                                                        5),
-                            contents='hi how are you?')
-                    ])
+                messages=[
+                    models.Message(
+                        sender='dummy_sender',
+                        timestamp=datetime.datetime(2018, 10, 18, 18, 27, 5),
+                        contents='hi how are you?')
                 ]),
             models.History(
                 local_username='dummy_local123',
                 remote_usernames=['dummy_remote345'],
-                sessions=[
-                    models.Session(messages=[
-                        models.Message(
-                            sender='dummy_sender',
-                            timestamp=datetime.datetime(2018, 10, 18, 18, 27,
-                                                        5),
-                            contents='hi how are you?')
-                    ])
+                messages=[
+                    models.Message(
+                        sender='dummy_sender',
+                        timestamp=datetime.datetime(2018, 10, 18, 18, 27, 5),
+                        contents='hi how are you?')
                 ]))

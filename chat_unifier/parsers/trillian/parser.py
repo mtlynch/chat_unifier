@@ -25,7 +25,7 @@ class Parser(object):
         return models.History(
             local_username=local_username,
             remote_usernames=list(remote_usernames),
-            sessions=[models.Session(messages=messages)])
+            messages=messages)
 
 
 def _is_session_start_line(parsed_line):
