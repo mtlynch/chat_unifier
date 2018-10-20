@@ -1,10 +1,5 @@
 def print_history(history):
-    for session in history.sessions:
-        print_session(session)
-
-
-def print_session(session):
-    for message in session.messages:
+    for message in history.messages:
         print_message(message)
 
 
