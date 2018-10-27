@@ -35,11 +35,10 @@ def main(args):
                 parser = trillian_parser.Parser()
                 merger.add(parser.parse(log_handle.read()))
                 logger.info('Parsed %s', os.path.basename(log_path))
-    print json.dumps(
-        [h for h in merger],
-        indent=2,
-        sort_keys=True,
-        cls=json_serializer.Serializer)
+    print json.dumps([h for h in merger],
+                     indent=2,
+                     sort_keys=True,
+                     cls=json_serializer.Serializer)
 
 
 if __name__ == '__main__':
