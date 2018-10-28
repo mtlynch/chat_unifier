@@ -24,7 +24,7 @@ def _history_list_to_list_of_dicts(history_list):
 def _history_to_dict(history):
     return {
         'localUsername': history.local_username,
-        'remoteUsernames': history.remote_usernames,
+        'remoteUsername': history.remote_username,
         'messages': _messages_to_list_of_dicts(history.messages)
     }
 

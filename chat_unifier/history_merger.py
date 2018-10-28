@@ -20,13 +20,12 @@ class Merger(object):
 
 
 def _key_for_history(history):
-    return '%s:%s' % (history.local_username, ','.join(
-        history.remote_usernames))
+    return '%s:%s' % (history.local_username, history.remote_username)
 
 
 def _merge_histories(a, b):
     messages = sorted(a.messages + b.messages, key=lambda m: m.timestamp)
     return models.History(
         local_username=a.local_username,
-        remote_usernames=a.remote_usernames,
+        remote_username=a.remote_username,
         messages=messages)

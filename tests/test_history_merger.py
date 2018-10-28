@@ -12,7 +12,7 @@ class HistoryMergerTest(unittest.TestCase):
         merger.add(
             models.History(
                 local_username='dummy_local123',
-                remote_usernames=['dummy_remote345'],
+                remote_username='dummy_remote345',
                 messages=[
                     models.Message(
                         sender='dummy_remote345',
@@ -26,7 +26,7 @@ class HistoryMergerTest(unittest.TestCase):
         merger.add(
             models.History(
                 local_username='dummy_local123',
-                remote_usernames=['dummy_remote345'],
+                remote_username='dummy_remote345',
                 messages=[
                     models.Message(
                         sender='dummy_remote345',
@@ -44,7 +44,7 @@ class HistoryMergerTest(unittest.TestCase):
             merged_history,
             models.History(
                 local_username='dummy_local123',
-                remote_usernames=['dummy_remote345'],
+                remote_username='dummy_remote345',
                 messages=[
                     models.Message(
                         sender='dummy_remote345',
@@ -69,7 +69,7 @@ class HistoryMergerTest(unittest.TestCase):
         merger.add(
             models.History(
                 local_username='dummy_local123',
-                remote_usernames=['dummy_remote345'],
+                remote_username='dummy_remote345',
                 messages=[
                     models.Message(
                         sender='dummy_remote345',
@@ -83,7 +83,7 @@ class HistoryMergerTest(unittest.TestCase):
         merger.add(
             models.History(
                 local_username='dummy_local123',
-                remote_usernames=['dummy_remote999'],
+                remote_username='dummy_remote999',
                 messages=[
                     models.Message(
                         sender='dummy_remote999',

@@ -17,7 +17,7 @@ class ParserTest(unittest.TestCase):
 """.lstrip()),
             models.History(
                 local_username='LocalUser456',
-                remote_usernames=['RemoteBuddy123'],
+                remote_username='RemoteBuddy123',
                 messages=[
                     models.Message(
                         sender=u'RemoteBuddy123',
