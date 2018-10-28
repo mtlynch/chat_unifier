@@ -17,7 +17,7 @@ find . -name "*.pyc" -delete
 
 # Run unit tests and calculate code coverage.
 coverage run \
-  --source "$SOURCE_DIR" \
+  --source "$SOURCE_DIR,main.py" \
   -m unittest discover
 
 # Check that source has correct formatting.

@@ -57,7 +57,7 @@ class HistoryTest(unittest.TestCase):
         self.assertEqual(
             models.History(
                 local_username='dummy_local123',
-                remote_usernames=['dummy_remote345'],
+                remote_username='dummy_remote345',
                 messages=[
                     models.Message(
                         sender='dummy_sender',
@@ -66,7 +66,7 @@ class HistoryTest(unittest.TestCase):
                 ]),
             models.History(
                 local_username='dummy_local123',
-                remote_usernames=['dummy_remote345'],
+                remote_username='dummy_remote345',
                 messages=[
                     models.Message(
                         sender='dummy_sender',

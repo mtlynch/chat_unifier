@@ -24,9 +24,7 @@ class HistoryTest(unittest.TestCase):
         "timestamp": "2018-10-18T18:27:05Z"
       }
     ], 
-    "remoteUsernames": [
-      "dummy_remote345"
-    ]
+    "remoteUsername": "dummy_remote345"
   }, 
   {
     "localUsername": "dummy_local123", 
@@ -37,9 +35,7 @@ class HistoryTest(unittest.TestCase):
         "timestamp": "2018-10-20T04:15:43Z"
       }
     ], 
-    "remoteUsernames": [
-      "dummy_remote456"
-    ]
+    "remoteUsername": "dummy_remote456"
   }
 ]
 """.strip(),
@@ -47,7 +43,7 @@ class HistoryTest(unittest.TestCase):
                 [
                     models.History(
                         local_username='dummy_local123',
-                        remote_usernames=['dummy_remote345'],
+                        remote_username='dummy_remote345',
                         messages=[
                             models.Message(
                                 sender='dummy_local123',
@@ -57,7 +53,7 @@ class HistoryTest(unittest.TestCase):
                         ]),
                     models.History(
                         local_username='dummy_local123',
-                        remote_usernames=['dummy_remote456'],
+                        remote_username='dummy_remote456',
                         messages=[
                             models.Message(
                                 sender='dummy_remote456',
