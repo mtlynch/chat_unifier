@@ -46,11 +46,17 @@ def parse(line):
     document = minidom.parseString(line)
     node = document.childNodes[0]
     tag_name = node.tagName
-    attributes = dict(node.attributes.items())
+    attributes = {}
+    for key, value in node.attributes.items():
+        attributes[key] = _decode_attribute_value(value)
     if tag_name == 'session':
         return _parse_session_attributes(attributes)
     elif tag_name == 'message':
         return _parse_message_attributes(attributes)
+
+
+def _decode_attribute_value(text):
+    return urllib.unquote(text)
 
 
 def _parse_session_attributes(attributes):
@@ -103,7 +109,7 @@ def _parse_informational_message(attributes):
     return InformationalMessageLine(
         timestamp=_parse_timestamp_attribute(attributes[u'time']),
         medium=attributes[u'medium'],
-        contents=_decode_message_text(attributes[u'text']))
+        contents=attributes[u'text'])
 
 
 def _parse_outgoing_message(attributes):
@@ -113,7 +119,7 @@ def _parse_outgoing_message(attributes):
         sender=attributes[u'from'],
         sender_display=attributes[u'from_display'],
         recipient=attributes[u'to'],
-        contents=_decode_message_text(attributes[u'text']))
+        contents=attributes[u'text'])
 
 
 def _parse_incoming_message(attributes):
@@ -123,11 +129,7 @@ def _parse_incoming_message(attributes):
         sender=attributes[u'from'],
         sender_display=attributes[u'from_display'],
         recipient=attributes[u'to'],
-        contents=_decode_message_text(attributes[u'text']))
-
-
-def _decode_message_text(text):
-    return urllib.unquote(text)
+        contents=attributes[u'text'])
 
 
 def _parse_timestamp_attribute(timestamp_attribute):
