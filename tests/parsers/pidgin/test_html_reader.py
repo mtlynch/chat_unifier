@@ -1,4 +1,3 @@
-import datetime
 import unittest
 
 from chat_unifier.parsers.pidgin import html_reader
