@@ -6,6 +6,9 @@ RESULT_TYPE_TIMESTAMP = 'timestamp'
 RESULT_TYPE_DISPLAY_NAME = 'display-name'
 RESULT_TYPE_MESSAGE_CONTENTS = 'message-contents'
 
+MESSAGE_DIRECTION_INCOMING = 'incoming'
+MESSAGE_DIRECTION_OUTGOING = 'outgoing'
+
 _STATE_SEEKING_TITLE = 1
 _STATE_PARSING_TITLE = 2
 _STATE_SEEKING_NEXT_MESSAGE = 3
@@ -65,10 +68,10 @@ class Reader(HTMLParser):
             if 'color' in attrs_dict:
                 font_color = attrs_dict['color']
                 if _is_local_user_font_color(font_color):
-                    self._add_message_start('local')
+                    self._add_message_start(MESSAGE_DIRECTION_OUTGOING)
                     self._update_state(_STATE_PARSING_TIMESTAMP)
                 elif _is_remote_user_font_color(font_color):
-                    self._add_message_start('remote')
+                    self._add_message_start(MESSAGE_DIRECTION_INCOMING)
                     self._update_state(_STATE_PARSING_TIMESTAMP)
                 elif (_is_system_message_font_color(font_color) or
                       _is_pidgin_message_font_color(font_color)):
