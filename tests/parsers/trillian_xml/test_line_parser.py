@@ -1,7 +1,7 @@
 import datetime
 import unittest
 
-from chat_unifier.parsers.trillian import line_parser
+from chat_unifier.parsers.trillian_xml import line_parser
 
 
 class LineParserTest(unittest.TestCase):

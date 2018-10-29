@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 
 from chat_unifier import models
-from chat_unifier.parsers.trillian import line_parser
+from chat_unifier.parsers.trillian_xml import line_parser
 
 
 class Parser(object):
