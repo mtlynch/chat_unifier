@@ -28,7 +28,7 @@ def main(args):
     configure_logging()
     logger.info('Started runnning')
     merger = history_merger.Merger()
-    for log_dir in args.log_dirs:
+    for log_dir in args.trillian:
         logger.info('Searching for logs in %s', log_dir)
         for log_path in trillian_xml_iterator.iterate_files(log_dir):
             with open(log_path) as log_handle:
@@ -46,5 +46,5 @@ if __name__ == '__main__':
         prog='Chat Unifier',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument(
-        'log_dirs', nargs='+', help='Directory containing log files')
+        '--trillian', action='append', help='Trillian XML log root')
     main(parser.parse_args())
