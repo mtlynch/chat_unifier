@@ -7,7 +7,7 @@ import logging
 
 from chat_unifier import json_serializer
 from chat_unifier import history_merger
-from chat_unifier.parsers.trillian import parser as trillian_parser
+from chat_unifier.parsers.trillian_xml import parser as trillian_parser
 from chat_unifier.file_iterators import trillian_xml as trillian_xml_iterator
 
 logger = logging.getLogger(__name__)
