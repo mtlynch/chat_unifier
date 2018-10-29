@@ -8,6 +8,7 @@ import logging
 from chat_unifier import json_serializer
 from chat_unifier import history_merger
 from chat_unifier.parsers.trillian_xml import parser as trillian_parser
+from chat_unifier.file_iterators import pidgin as pidgin_iterator
 from chat_unifier.file_iterators import trillian_xml as trillian_xml_iterator
 
 logger = logging.getLogger(__name__)
@@ -28,17 +29,33 @@ def main(args):
     configure_logging()
     logger.info('Started runnning')
     merger = history_merger.Merger()
-    for log_dir in args.trillian:
-        logger.info('Searching for logs in %s', log_dir)
-        for log_path in trillian_xml_iterator.iterate_files(log_dir):
-            with open(log_path) as log_handle:
-                parser = trillian_parser.Parser()
-                merger.add(parser.parse(log_handle.read()))
-                logger.info('Parsed %s', os.path.basename(log_path))
+    processors = [
+        (args.trillian, trillian_xml_iterator, trillian_parser.Parser()),
+        (args.pidgin, pidgin_iterator, None),
+    ]
+    for dir_roots, file_iterator, log_parser in processors:
+        if dir_roots:
+            _process_log_dirs(dir_roots, file_iterator, log_parser, merger)
     print json.dumps([h for h in merger],
                      indent=2,
                      sort_keys=True,
                      cls=json_serializer.Serializer)
+
+
+def _process_log_dirs(dir_roots, file_iterator, log_parser, merger):
+    for dir_root in dir_roots:
+        _process_log_dir(dir_root, file_iterator, log_parser, merger)
+
+
+def _process_log_dir(dir_root, file_iterator, log_parser, merger):
+    logger.info('Searching for logs in %s', dir_root)
+    for log_path in file_iterator.iterate_files(dir_root):
+        if not log_parser:
+            logger.info('Skipping %s', log_path)
+            continue
+        with open(log_path) as log_handle:
+            merger.add(parser.parse(log_handle.read()))
+            logger.info('Parsed %s', os.path.basename(log_path))
 
 
 if __name__ == '__main__':
@@ -47,4 +64,5 @@ if __name__ == '__main__':
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument(
         '--trillian', action='append', help='Trillian XML log root')
+    parser.add_argument('--pidgin', action='append', help='Pidgin log root')
     main(parser.parse_args())
