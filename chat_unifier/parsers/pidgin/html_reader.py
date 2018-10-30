@@ -60,11 +60,15 @@ class Reader(HTMLParser):
     def results(self):
         return self._results
 
+    def feed(self, html):
+        html_annotated = _annotate_html(html)
+        HTMLParser.feed(self, html_annotated)
+
     def handle_starttag(self, tag, attrs):
         attrs_dict = dict(attrs)
         if tag == 'title':
             self._update_state(_STATE_PARSING_TITLE)
-        if ((self._state == _STATE_SEEKING_NEXT_MESSAGE) and (tag == 'font')):
+        elif ((self._state == _STATE_SEEKING_NEXT_MESSAGE) and (tag == 'font')):
             if 'color' in attrs_dict:
                 font_color = attrs_dict['color']
                 if _is_local_user_font_color(font_color):
@@ -94,6 +98,9 @@ class Reader(HTMLParser):
 
     def handle_startendtag(self, tag, attrs):
         if ((self._state == _STATE_PARSING_CONTENTS) and (tag == 'br')):
+            self._add_message_contents('\n')
+        elif ((self._state == _STATE_PARSING_CONTENTS) and
+              (tag == 'message-end')):
             self._update_state(_STATE_SEEKING_NEXT_MESSAGE)
 
     def handle_data(self, data):
@@ -106,22 +113,59 @@ class Reader(HTMLParser):
         elif self._state == _STATE_PARSING_CONTENTS:
             if not data.strip():
                 return
-            self._add_message_contents(data)
+            self._add_message_contents(data.decode('utf8'))
+
+    def handle_entityref(self, name):
+        decoded = _decode_html_entity_ref(name)
+        if self._state == _STATE_PARSING_CONTENTS:
+            self._add_message_contents(decoded)
+        elif self._state == _STATE_PARSING_DISPLAY_NAME:
+            self._add_display_name(decoded)
+
+    def handle_charref(self, name):
+        decoded = _decode_html_char_ref(name)
+        if self._state == _STATE_PARSING_CONTENTS:
+            self._add_message_contents(decoded)
+        elif self._state == _STATE_PARSING_DISPLAY_NAME:
+            self._add_display_name(decoded)
 
     def _add_title(self, title):
-        self.results.append((RESULT_TYPE_TITLE, title))
+        self._results.append((RESULT_TYPE_TITLE, title))
 
     def _add_message_start(self, message_type):
-        self.results.append((RESULT_TYPE_MESSAGE_START, message_type))
+        self._results.append((RESULT_TYPE_MESSAGE_START, message_type))
 
     def _add_timestamp(self, timestamp):
-        self.results.append((RESULT_TYPE_TIMESTAMP, timestamp))
+        self._results.append((RESULT_TYPE_TIMESTAMP, timestamp))
 
     def _add_display_name(self, display_name):
-        self.results.append((RESULT_TYPE_DISPLAY_NAME, display_name))
+        self._append_or_coalesce_result(RESULT_TYPE_DISPLAY_NAME, display_name)
 
     def _add_message_contents(self, message_contents):
-        self.results.append((RESULT_TYPE_MESSAGE_CONTENTS, message_contents))
+        self._append_or_coalesce_result(RESULT_TYPE_MESSAGE_CONTENTS,
+                                        message_contents)
+
+    def _append_or_coalesce_result(self, result_type, result_value):
+        if self._results:
+            last_result_type, last_result_value = self._results[-1]
+            if last_result_type == result_type:
+                self._results.pop()
+                result_value = last_result_value + result_value
+        self._results.append((result_type, result_value))
 
     def _update_state(self, new_state):
         self._state = new_state
+
+
+def _annotate_html(html):
+    # We need to specially mark line-terminating <br> tags otherwise there's
+    # ambiguity in where the message ends (<br> can appear within messages).
+    return html.replace('\r\n', '\n').replace('<br/>\n', '<message-end/>\n')
+
+
+def _decode_html_entity_ref(entity_ref):
+    return HTMLParser().unescape('&' + entity_ref + ';')
+
+
+def _decode_html_char_ref(entity_ref):
+    return HTMLParser().unescape('&#' + entity_ref + ';')
