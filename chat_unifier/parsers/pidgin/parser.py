@@ -105,12 +105,6 @@ class _ResultsToHistoryConverter(object):
     def _timestamp_rolled_over_to_next_day(self, timestamp):
         return timestamp < self._last_timestamp
 
-    def _peek_next_result_type(self):
-        if not self._results:
-            return None
-        result_type, _ = self._results[0]
-        return result_type
-
     def _pop_result_with_type(self, result_type_expected):
         result_type, result_value = self._results.pop(0)
         if result_type != result_type_expected:
