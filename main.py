@@ -7,6 +7,7 @@ import logging
 
 from chat_unifier import json_serializer
 from chat_unifier import history_merger
+from chat_unifier.parsers.pidgin import parser as pidgin_parser
 from chat_unifier.parsers.trillian_xml import parser as trillian_parser
 from chat_unifier.file_iterators import pidgin as pidgin_iterator
 from chat_unifier.file_iterators import trillian_xml as trillian_xml_iterator
@@ -31,7 +32,7 @@ def main(args):
     merger = history_merger.Merger()
     processors = [
         (args.trillian, trillian_xml_iterator, trillian_parser.Parser()),
-        (args.pidgin, pidgin_iterator, None),
+        (args.pidgin, pidgin_iterator, pidgin_parser.Parser()),
     ]
     for dir_roots, file_iterator, log_parser in processors:
         if dir_roots:
@@ -50,11 +51,12 @@ def _process_log_dirs(dir_roots, file_iterator, log_parser, merger):
 def _process_log_dir(dir_root, file_iterator, log_parser, merger):
     logger.info('Searching for logs in %s', dir_root)
     for log_path in file_iterator.iterate_files(dir_root):
-        if not log_parser:
-            logger.info('Skipping %s', log_path)
-            continue
+        logger.info('Parsing %s', log_path)
         with open(log_path) as log_handle:
-            merger.add(parser.parse(log_handle.read()))
+            try:
+                merger.add(log_parser.parse(log_handle.read()))
+            except Exception as ex:
+                logger.error('Failed to parse: %s', ex.message)
             logger.info('Parsed %s', os.path.basename(log_path))
 
 
