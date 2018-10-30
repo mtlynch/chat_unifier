@@ -51,3 +51,20 @@ class PidginFileIteratorTest(unittest.TestCase):
                 '/log/aim/LocalUser123/RemoteUser345/2007-02-24.020826-0500EST.html',
                 '/log/aim/LocalUser123/RemoteUser345/2007-02-25.154550-0500EST.html',
             ], [f for f in pidgin.iterate_files('/logs')])
+
+    def test_ignores_system_log_files(self):
+        with mock.patch.object(os, 'walk') as mock_walk:
+            mock_walk.return_value = [
+                ('/logs', ('aim',), ()),
+                ('/logs/aim', ('LocalUser123',), ()),
+                ('/log/aim/LocalUser123', ('RemoteUser345', '.system'), ()),
+                ('/log/aim/LocalUser123/RemoteUser345', (),
+                 ('2007-02-24.020826-0500EST.html',
+                  '2007-02-25.154550-0500EST.html')),
+                ('/log/aim/LocalUser123/.system', (),
+                 ('2007-03-05.231324-0500EST.html',)),
+            ]
+            self.assertEqual([
+                '/log/aim/LocalUser123/RemoteUser345/2007-02-24.020826-0500EST.html',
+                '/log/aim/LocalUser123/RemoteUser345/2007-02-25.154550-0500EST.html',
+            ], [f for f in pidgin.iterate_files('/logs')])
