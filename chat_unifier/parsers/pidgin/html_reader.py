@@ -111,9 +111,10 @@ class Reader(HTMLParser):
         elif self._state == _STATE_PARSING_DISPLAY_NAME:
             self._add_display_name(data)
         elif self._state == _STATE_PARSING_CONTENTS:
-            if not data.strip():
-                return
-            self._add_message_contents(data.decode('utf8'))
+            if data.strip():
+                self._add_message_contents(data.decode('utf8'))
+            else:
+                self._add_message_contents('')
 
     def handle_entityref(self, name):
         decoded = _decode_html_entity_ref(name)
