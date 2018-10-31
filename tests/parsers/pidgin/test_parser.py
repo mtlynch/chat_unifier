@@ -107,6 +107,30 @@ class PidginParserTest(unittest.TestCase):
                         contents='we need a \'bigger fish to fry\' poster'),
                 ]))
 
+    def test_handles_empty_messages(self):
+        self.assertEqual(
+            parser.Parser().parse("""
+<html><head><meta http-equiv="content-type" content="text/html; charset=UTF-8"><title>Conversation with RemoteUser345 at 9/3/2006 12:11:55 PM on LocalUser123 (aim)</title></head><body><h3>Conversation with RemoteUser345 at 9/3/2006 12:11:55 PM on LocalUser123 (aim)</h3>
+<font color="#16569E"><font size="2">(12:12:00 PM)</font> <b>Bob:</b></font> <span style='font-size: small;'>are you there?</span><br/>
+<font color="#A82F2F"><font size="2">(12:12:00 PM)</font> <b>Alice &lt;AUTO-REPLY&gt;:</b></font> 
+
+<br/>
+</body></html>
+""".lstrip()),
+            models.History(
+                local_username='LocalUser123',
+                remote_username='RemoteUser345',
+                messages=[
+                    models.Message(
+                        sender='LocalUser123',
+                        timestamp=datetime.datetime(2006, 9, 3, 12, 12, 00),
+                        contents=u'are you there?'),
+                    models.Message(
+                        sender='RemoteUser345',
+                        timestamp=datetime.datetime(2006, 9, 3, 12, 12, 00),
+                        contents=u''),
+                ]))
+
     def test_raises_exception_when_title_has_unexpected_format(self):
         with self.assertRaises(parser.InvalidMetadata):
             parser.Parser().parse("""
