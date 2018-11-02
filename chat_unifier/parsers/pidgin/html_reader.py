@@ -65,26 +65,11 @@ class Reader(HTMLParser):
         HTMLParser.feed(self, html_annotated)
 
     def handle_starttag(self, tag, attrs):
-        attrs_dict = dict(attrs)
-        if tag == 'title':
+        if ((self._state == _STATE_SEEKING_TITLE) and (tag == 'title')):
             self._update_state(_STATE_PARSING_TITLE)
         elif ((self._state == _STATE_SEEKING_NEXT_MESSAGE) and (tag == 'font')):
-            if 'color' in attrs_dict:
-                font_color = attrs_dict['color']
-                if _is_local_user_font_color(font_color):
-                    self._results.append_message_start(
-                        MESSAGE_DIRECTION_OUTGOING)
-                    self._update_state(_STATE_PARSING_TIMESTAMP)
-                elif _is_remote_user_font_color(font_color):
-                    self._results.append_message_start(
-                        MESSAGE_DIRECTION_INCOMING)
-                    self._update_state(_STATE_PARSING_TIMESTAMP)
-                elif (_is_system_message_font_color(font_color) or
-                      _is_pidgin_message_font_color(font_color)):
-                    pass
-                else:
-                    raise UnexpectedFontColor(
-                        'Font color %s is unexpected' % font_color)
+            if 'color' in dict(attrs):
+                self._process_message_start(dict(attrs)['color'])
         elif ((self._state == _STATE_SEEKING_DISPLAY_NAME) and (tag == 'b')):
             self._update_state(_STATE_PARSING_DISPLAY_NAME)
 
@@ -131,6 +116,20 @@ class Reader(HTMLParser):
             self._results.append_message_contents(decoded)
         elif self._state == _STATE_PARSING_DISPLAY_NAME:
             self._results.append_display_name(decoded)
+
+    def _process_message_start(self, font_color):
+        if _is_local_user_font_color(font_color):
+            self._results.append_message_start(MESSAGE_DIRECTION_OUTGOING)
+            self._update_state(_STATE_PARSING_TIMESTAMP)
+        elif _is_remote_user_font_color(font_color):
+            self._results.append_message_start(MESSAGE_DIRECTION_INCOMING)
+            self._update_state(_STATE_PARSING_TIMESTAMP)
+        elif (_is_system_message_font_color(font_color) or
+              _is_pidgin_message_font_color(font_color)):
+            pass
+        else:
+            raise UnexpectedFontColor(
+                'Font color %s is unexpected' % font_color)
 
     def _update_state(self, new_state):
         self._state = new_state
