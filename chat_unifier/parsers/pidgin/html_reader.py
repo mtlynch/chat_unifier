@@ -54,11 +54,11 @@ class Reader(HTMLParser):
     def __init__(self):
         HTMLParser.__init__(self)
         self._state = _STATE_SEEKING_TITLE
-        self._results = []
+        self._results = _ResultSequence()
 
     @property
     def results(self):
-        return self._results
+        return [r for r in self._results]
 
     def feed(self, html):
         html_annotated = _annotate_html(html)
@@ -72,10 +72,12 @@ class Reader(HTMLParser):
             if 'color' in attrs_dict:
                 font_color = attrs_dict['color']
                 if _is_local_user_font_color(font_color):
-                    self._add_message_start(MESSAGE_DIRECTION_OUTGOING)
+                    self._results.append_message_start(
+                        MESSAGE_DIRECTION_OUTGOING)
                     self._update_state(_STATE_PARSING_TIMESTAMP)
                 elif _is_remote_user_font_color(font_color):
-                    self._add_message_start(MESSAGE_DIRECTION_INCOMING)
+                    self._results.append_message_start(
+                        MESSAGE_DIRECTION_INCOMING)
                     self._update_state(_STATE_PARSING_TIMESTAMP)
                 elif (_is_system_message_font_color(font_color) or
                       _is_pidgin_message_font_color(font_color)):
@@ -98,51 +100,64 @@ class Reader(HTMLParser):
 
     def handle_startendtag(self, tag, attrs):
         if ((self._state == _STATE_PARSING_CONTENTS) and (tag == 'br')):
-            self._add_message_contents('\n')
+            self._results.append_message_contents('\n')
         elif ((self._state == _STATE_PARSING_CONTENTS) and
               (tag == 'message-end')):
             self._update_state(_STATE_SEEKING_NEXT_MESSAGE)
 
     def handle_data(self, data):
         if self._state == _STATE_PARSING_TITLE:
-            self._add_title(data)
+            self._results.append_title(data)
         elif self._state == _STATE_PARSING_TIMESTAMP:
-            self._add_timestamp(data)
+            self._results.append_timestamp(data)
         elif self._state == _STATE_PARSING_DISPLAY_NAME:
-            self._add_display_name(data)
+            self._results.append_display_name(data)
         elif self._state == _STATE_PARSING_CONTENTS:
             if data.strip():
-                self._add_message_contents(data.decode('utf8'))
+                self._results.append_message_contents(data.decode('utf8'))
             else:
-                self._add_message_contents('')
+                self._results.append_message_contents('')
 
     def handle_entityref(self, name):
         decoded = _decode_html_entity_ref(name)
         if self._state == _STATE_PARSING_CONTENTS:
-            self._add_message_contents(decoded)
+            self._results.append_message_contents(decoded)
         elif self._state == _STATE_PARSING_DISPLAY_NAME:
-            self._add_display_name(decoded)
+            self._results.append_display_name(decoded)
 
     def handle_charref(self, name):
         decoded = _decode_html_char_ref(name)
         if self._state == _STATE_PARSING_CONTENTS:
-            self._add_message_contents(decoded)
+            self._results.append_message_contents(decoded)
         elif self._state == _STATE_PARSING_DISPLAY_NAME:
-            self._add_display_name(decoded)
+            self._results.append_display_name(decoded)
 
-    def _add_title(self, title):
+    def _update_state(self, new_state):
+        self._state = new_state
+
+
+class _ResultSequence(object):
+
+    def __init__(self):
+        self._results = []
+
+    def __iter__(self):
+        for r in self._results:
+            yield r
+
+    def append_title(self, title):
         self._results.append((RESULT_TYPE_TITLE, title))
 
-    def _add_message_start(self, message_type):
+    def append_message_start(self, message_type):
         self._results.append((RESULT_TYPE_MESSAGE_START, message_type))
 
-    def _add_timestamp(self, timestamp):
+    def append_timestamp(self, timestamp):
         self._results.append((RESULT_TYPE_TIMESTAMP, timestamp))
 
-    def _add_display_name(self, display_name):
+    def append_display_name(self, display_name):
         self._append_or_coalesce_result(RESULT_TYPE_DISPLAY_NAME, display_name)
 
-    def _add_message_contents(self, message_contents):
+    def append_message_contents(self, message_contents):
         self._append_or_coalesce_result(RESULT_TYPE_MESSAGE_CONTENTS,
                                         message_contents)
 
@@ -153,9 +168,6 @@ class Reader(HTMLParser):
                 self._results.pop()
                 result_value = last_result_value + result_value
         self._results.append((result_type, result_value))
-
-    def _update_state(self, new_state):
-        self._state = new_state
 
 
 def _annotate_html(html):
